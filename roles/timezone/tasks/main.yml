@@ -1,25 +1,23 @@
+---
 # file: roles/timezone/tasks/main.yml
 
-- name: Timezone | Symlink the correct localtime - pt.1
-  file: path=/etc/localtime state=absent
-
-- name: Timezone | Symlink the correct localtime - pt.2 (/etc/localtime)
-  file: src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime state=link owner=root group=root mode=0644
-
-- name: Timezone | Make sure the dependencies are installed
-  apt: name={{ item }} state=installed
+- name:       Timezone | Make sure the dependencies are installed
+  apt:        name={{ item }} state=installed
   with_items:
     - tzdata
     - ntp
-    - ntpdate
+  tags:       time
 
-- name: Timezone | Update the hardware clock
-  command: dpkg-reconfigure -f noninteractive tzdata
+- name:       Timezone | Configure the ntp servers (/etc/ntp.conf)
+  template:   src=ntp.conf.j2 dest=/etc/ntp.conf owner=root group=root mode=0644
+  notify:     restart ntpd
+  tags:       time
 
-- name: Timezone | Make sure ntpd is running and enabled
-  service: name=ntp state=restarted enabled=yes
+- name:       Timezone | Make sure ntpd is running and enabled
+  service:    name=ntp state=restarted enabled=yes
+  tags:       time
 
-- name: Timezone | Configure the ntp servers (/etc/ntp.conf)
-  template: src=etc_ntp.conf.j2 dest=/etc/ntp.conf
-  notify:
-    - restart ntp
+- name:       Timezone | Add timezone to /etc/timezone
+  copy:       content={{ timezone }} dest=/etc/timezone owner=root group=root mode=0644
+  notify:     [update timezone, restart cron]
+  tags:       time

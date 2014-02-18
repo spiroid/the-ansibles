@@ -1,4 +1,8 @@
+---
 # file: roles/timezone/handlers/main.yml
 
-- name: restart ntp
-  action: service name=ntp state=restarted
+- name:     restart ntpd
+  service:  name=ntp state=restarted
+
+- name:     update timezone
+  command:  dpkg-reconfigure -f noninteractive tzdata
