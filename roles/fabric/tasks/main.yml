@@ -1,0 +1,27 @@
+---
+- name: pip is installed
+  apt:  pkg=python-pip state=installed
+  when: fabric.virtualenv
+  tags: fabric
+
+- name: virtualenv is installed
+  apt:  pkg=python-virtualenv state=installed
+  when: fabric.virtualenv
+  tags: fabric
+
+- name: python compilaton header
+  apt:  pkg=python-dev state=installed
+  when: fabric.virtualenv
+  tags: fabric
+
+# Install Fabric into the specified virtualenv, inheriting none of the globally installed modules
+- name: install fabric in virtual_env
+  pip: name=fabric virtualenv={{fabric.virtualenv}}
+  when: fabric.virtualenv
+  tags: fabric
+
+# Install Fabric with apt
+- name: install fabric globally
+  apt:  pkg=fabric state=installed
+  when: not fabric.virtualenv
+  tags: fabric

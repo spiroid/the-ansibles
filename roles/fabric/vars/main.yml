@@ -1,0 +1,6 @@
+---
+# Fabric role variables
+fabric:
+  # Should fabric be installed in a virtualenv
+  # If it's the case, change the variable to the venv path
+  virtualenv: false
